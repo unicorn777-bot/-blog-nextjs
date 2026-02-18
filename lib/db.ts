@@ -1,9 +1,8 @@
 ﻿import { neon } from '@neondatabase/serverless';
 import { unstable_noStore as noStore } from 'next/cache';
 
-// 创建数据库连接
-const getDb = () => {
-  // Neon 提供的环境变量优先级
+// 创建数据库连接 - Neon 返回的是一个模板字符串标签函数
+const getSql = () => {
   const connectionString = 
     process.env.DATABASE_URL_UNPOOLED ||
     process.env.POSTGRES_URL_NO_SSL ||
@@ -13,48 +12,45 @@ const getDb = () => {
   if (!connectionString) {
     throw new Error('数据库连接字符串未配置');
   }
-  // 使用 unknown 中间转换绕过类型检查
-  return neon(connectionString) as unknown as (query: string, params?: unknown[]) => Promise<unknown[]>;
+  return neon(connectionString);
 };
 
-// 定义 SQL 函数类型
-interface SqlFunction {
-  <T = unknown>(strings: TemplateStringsArray, ...values: (string | number | boolean | Date | null | undefined)[]): Promise<{ rows: T[] }>;
-  query: <T = unknown>(queryString: string, params?: (string | number | boolean | null)[]) => Promise<{ rows: T[] }>;
-}
+// 缓存 SQL 实例
+let sqlInstance: ReturnType<typeof neon> | null = null;
 
-// SQL 查询函数 - 支持模板字符串
-async function sqlBase<T = unknown>(
-  strings: TemplateStringsArray,
-  ...values: (string | number | boolean | Date | null | undefined)[]
-): Promise<{ rows: T[] }> {
-  const db = getDb();
-  
-  // 构建查询字符串
-  let query = strings[0];
-  const params: unknown[] = [];
-  
-  for (let i = 0; i < values.length; i++) {
-    params.push(values[i]);
-    query += `$${i + 1}${strings[i + 1] || ''}`;
+// 获取 SQL 实例
+const getSqlInstance = () => {
+  if (!sqlInstance) {
+    sqlInstance = getSql();
   }
-  
-  const result = await db(query, params);
-  return { rows: result as T[] };
-}
-
-// 添加 query 方法
-const queryMethod = async <T = unknown>(
-  queryString: string,
-  params: (string | number | boolean | null)[] = []
-): Promise<{ rows: T[] }> => {
-  const db = getDb();
-  const result = await db(queryString, params);
-  return { rows: result as T[] };
+  return sqlInstance;
 };
 
-// 导出 sql 函数
-const sql: SqlFunction = Object.assign(sqlBase, { query: queryMethod }) as SqlFunction;
+// 创建兼容的 SQL 接口
+const sql = Object.assign(
+  // 模板字符串调用: sql`SELECT * FROM table`
+  // 返回 { rows: T[] } 格式以兼容代码中的使用方式
+  async <T = unknown>(strings: TemplateStringsArray, ...values: (string | number | boolean | Date | null | undefined)[]): Promise<{ rows: T[] }> => {
+    const instance = getSqlInstance();
+    const result = await instance(strings, ...values);
+    return { rows: result as T[] };
+  },
+  {
+    // 普通查询调用: sql.query("SELECT * FROM table WHERE id = $1", [id])
+    query: async <T = unknown>(queryString: string, params: (string | number | boolean | null)[] = []): Promise<{ rows: T[] }> => {
+      const instance = getSqlInstance();
+      // 使用 Neon 的 unsafe 方法执行带参数的查询
+      const result = await instance.unsafe(queryString, params as string[]);
+      return { rows: result as T[] };
+    },
+    // unsafe 方法
+    unsafe: async <T = unknown>(queryString: string, params: (string | number | boolean | null)[] = []): Promise<{ rows: T[] }> => {
+      const instance = getSqlInstance();
+      const result = await instance.unsafe(queryString, params as string[]);
+      return { rows: result as T[] };
+    }
+  }
+);
 
 // 用户表
 export interface User {
