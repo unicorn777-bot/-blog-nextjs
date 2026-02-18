@@ -32,7 +32,7 @@ export const metadata: Metadata = {
   authors: [{ name: "Asta333" }],
   creator: "Asta333",
   publisher: "Asta333",
-  metadataBase: new URL("https://unicorn777-bot.github.io"),
+  metadataBase: new URL("https://102037.xyz"),
   alternates: {
     canonical: "/",
   },
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "zh_CN",
-    url: "https://unicorn777-bot.github.io",
+    url: "https://102037.xyz",
     siteName: "欢迎来到2037",
     title: "欢迎来到2037",
     description: "这是一个关于未来科技和思考的博客，欢迎来到2037年的世界",
@@ -76,6 +76,20 @@ export default function RootLayout({
     <html lang="zh-CN" suppressHydrationWarning>
       <head>
         <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var theme = localStorage.getItem('theme');
+                  if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                    document.documentElement.classList.add('dark');
+                  }
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}

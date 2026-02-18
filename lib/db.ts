@@ -150,12 +150,14 @@ export async function getPosts({
   status = 'published',
   categorySlug,
   tagSlug,
+  search,
 }: {
   limit?: number;
   offset?: number;
   status?: 'draft' | 'published' | 'archived' | 'all';
   categorySlug?: string;
   tagSlug?: string;
+  search?: string;
 } = {}): Promise<{ posts: Post[]; total: number }> {
   noStore();
 
@@ -179,6 +181,12 @@ export async function getPosts({
   if (tagSlug) {
     whereConditions.push(`t.slug = $${paramIndex}`);
     params.push(tagSlug);
+    paramIndex++;
+  }
+
+  if (search) {
+    whereConditions.push(`(p.title ILIKE $${paramIndex} OR p.content ILIKE $${paramIndex} OR p.excerpt ILIKE $${paramIndex})`);
+    params.push(`%${search}%`);
     paramIndex++;
   }
 

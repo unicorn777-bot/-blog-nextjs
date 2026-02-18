@@ -20,6 +20,7 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '10');
     const categorySlug = searchParams.get('category') || undefined;
     const tagSlug = searchParams.get('tag') || undefined;
+    const search = searchParams.get('search') || undefined;
 
     const offset = (page - 1) * limit;
 
@@ -29,6 +30,7 @@ export async function GET(request: NextRequest) {
       status: 'published',
       categorySlug,
       tagSlug,
+      search,
     });
 
     return NextResponse.json({
