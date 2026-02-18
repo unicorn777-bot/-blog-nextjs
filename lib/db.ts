@@ -42,18 +42,14 @@ const sql = Object.assign(
   },
   {
     // 普通查询调用: sql.query("SELECT * FROM table WHERE id = $1", [id])
+    // 使用 Neon 原生的 query 方法
     query: async <T = unknown>(queryString: string, params: (string | number | boolean | null)[] = []): Promise<SqlResult<T>> => {
       const instance = getSqlInstance();
-      // Neon 的 unsafe 方法签名: unsafe(queryString, params?, options?)
-      const result = await (instance.unsafe as (query: string, params?: unknown[]) => Promise<unknown[]>)(queryString, params);
+      const result = await instance.query(queryString, params);
       return { rows: result as T[] };
     },
-    // unsafe 方法
-    unsafe: async <T = unknown>(queryString: string, params: (string | number | boolean | null)[] = []): Promise<SqlResult<T>> => {
-      const instance = getSqlInstance();
-      const result = await (instance.unsafe as (query: string, params?: unknown[]) => Promise<unknown[]>)(queryString, params);
-      return { rows: result as T[] };
-    }
+    // unsafe 方法 - 用于模板字符串中的原始 SQL 片段
+    unsafe: (rawSQL: string) => getSqlInstance().unsafe(rawSQL)
   }
 );
 
