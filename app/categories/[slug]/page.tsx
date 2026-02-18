@@ -58,9 +58,6 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
               <Link href="/tags" className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition text-sm md:text-base">
                 标签
               </Link>
-              <Link href="/admin-8ca5e53f792989e9" className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition text-sm md:text-base">
-                管理
-              </Link>
             </nav>
           </div>
         </div>
