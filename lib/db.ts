@@ -91,12 +91,22 @@ export interface Category {
   created_at: Date;
 }
 
+// 分类表（带文章数量）
+export interface CategoryWithPostCount extends Category {
+  post_count: number;
+}
+
 // 标签表
 export interface Tag {
   id: string;
   name: string;
   slug: string;
   created_at: Date;
+}
+
+// 标签表（带文章数量）
+export interface TagWithPostCount extends Tag {
+  post_count: number;
 }
 
 // 文章分类关联表
@@ -304,19 +314,62 @@ export async function createPost(data: Omit<Post, 'id' | 'created_at' | 'updated
 }
 
 export async function updatePost(id: string, data: Partial<Omit<Post, 'id' | 'created_at' | 'updated_at' | 'view_count' | 'author_id'>>): Promise<Post> {
-  const result = await sql<Post>`
+  // 动态构建 SET 子句，支持设置 null 值
+  const setClauses: string[] = [];
+  const params: (string | number | boolean | null)[] = [];
+  let paramIndex = 1;
+  
+  if (data.title !== undefined) {
+    setClauses.push(`title = $${paramIndex}`);
+    params.push(data.title);
+    paramIndex++;
+  }
+  if (data.slug !== undefined) {
+    setClauses.push(`slug = $${paramIndex}`);
+    params.push(data.slug);
+    paramIndex++;
+  }
+  if (data.content !== undefined) {
+    setClauses.push(`content = $${paramIndex}`);
+    params.push(data.content);
+    paramIndex++;
+  }
+  if (data.excerpt !== undefined) {
+    setClauses.push(`excerpt = $${paramIndex}`);
+    params.push(data.excerpt);
+    paramIndex++;
+  }
+  if (data.cover_image !== undefined) {
+    setClauses.push(`cover_image = $${paramIndex}`);
+    params.push(data.cover_image);
+    paramIndex++;
+  }
+  if (data.status !== undefined) {
+    setClauses.push(`status = $${paramIndex}`);
+    params.push(data.status);
+    paramIndex++;
+  }
+  if (data.published_at !== undefined) {
+    setClauses.push(`published_at = $${paramIndex}`);
+    // 将 Date 转换为 ISO 字符串
+    params.push(data.published_at ? data.published_at.toISOString() : null);
+    paramIndex++;
+  }
+  
+  // 总是更新 updated_at
+  setClauses.push(`updated_at = NOW()`);
+  
+  // 添加 WHERE 条件的 id 参数
+  params.push(id);
+  
+  const query = `
     UPDATE posts
-    SET title = COALESCE(${data.title}, title),
-        slug = COALESCE(${data.slug}, slug),
-        content = COALESCE(${data.content}, content),
-        excerpt = COALESCE(${data.excerpt}, excerpt),
-        cover_image = COALESCE(${data.cover_image}, cover_image),
-        status = COALESCE(${data.status}, status),
-        published_at = COALESCE(${data.published_at ? data.published_at.toISOString() : null}, published_at),
-        updated_at = NOW()
-    WHERE id = ${id}
+    SET ${setClauses.join(', ')}
+    WHERE id = $${paramIndex}
     RETURNING *
   `;
+  
+  const result = await sql.query<Post>(query, params);
   return result.rows[0];
 }
 
@@ -329,9 +382,9 @@ export async function incrementPostViewCount(id: string): Promise<void> {
 }
 
 // 分类相关操作
-export async function getCategories(): Promise<Category[]> {
+export async function getCategories(): Promise<CategoryWithPostCount[]> {
   noStore();
-  const result = await sql<Category>`
+  const result = await sql<CategoryWithPostCount>`
     SELECT c.*, COUNT(pc.post_id) as post_count
     FROM categories c
     LEFT JOIN post_categories pc ON c.id = pc.category_id
@@ -358,9 +411,9 @@ export async function createCategory(data: Omit<Category, 'id' | 'created_at'>):
 }
 
 // 标签相关操作
-export async function getTags(): Promise<Tag[]> {
+export async function getTags(): Promise<TagWithPostCount[]> {
   noStore();
-  const result = await sql<Tag>`
+  const result = await sql<TagWithPostCount>`
     SELECT t.*, COUNT(pt.post_id) as post_count
     FROM tags t
     LEFT JOIN post_tags pt ON t.id = pt.tag_id
@@ -388,19 +441,27 @@ export async function createTag(data: Omit<Tag, 'id' | 'created_at'>): Promise<T
 
 // 文章分类关联操作
 export async function setPostCategories(postId: string, categoryIds: string[]): Promise<void> {
+  // 先删除旧的关联
   await sql`DELETE FROM post_categories WHERE post_id = ${postId}`;
 
-  for (const categoryId of categoryIds) {
-    await sql`INSERT INTO post_categories (post_id, category_id) VALUES (${postId}, ${categoryId})`;
+  // 批量插入新关联
+  if (categoryIds.length > 0) {
+    const values = categoryIds.map(() => `('${postId}', ?)`).join(', ');
+    const query = `INSERT INTO post_categories (post_id, category_id) VALUES ${values}`;
+    await sql.query(query, categoryIds);
   }
 }
 
 // 文章标签关联操作
 export async function setPostTags(postId: string, tagIds: string[]): Promise<void> {
+  // 先删除旧的关联
   await sql`DELETE FROM post_tags WHERE post_id = ${postId}`;
 
-  for (const tagId of tagIds) {
-    await sql`INSERT INTO post_tags (post_id, tag_id) VALUES (${postId}, ${tagId})`;
+  // 批量插入新关联
+  if (tagIds.length > 0) {
+    const values = tagIds.map(() => `('${postId}', ?)`).join(', ');
+    const query = `INSERT INTO post_tags (post_id, tag_id) VALUES ${values}`;
+    await sql.query(query, tagIds);
   }
 }
 
@@ -476,29 +537,35 @@ export async function getAllComments({
 } = {}): Promise<{ comments: Comment[]; total: number }> {
   noStore();
   
-  let query = `
-    SELECT c.*, p.title as post_title
-    FROM comments c
-    LEFT JOIN posts p ON c.post_id = p.id
-  `;
-  
   const params: (string | number)[] = [];
   let paramIndex = 1;
   
+  // 构建 WHERE 条件
+  const whereClause = status && status !== 'all' ? `WHERE c.status = $${paramIndex}` : '';
   if (status && status !== 'all') {
-    query += ` WHERE c.status = $${paramIndex}`;
     params.push(status);
     paramIndex++;
   }
   
-  query += ` ORDER BY c.created_at DESC LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`;
+  const query = `
+    SELECT c.*, p.title as post_title
+    FROM comments c
+    LEFT JOIN posts p ON c.post_id = p.id
+    ${whereClause}
+    ORDER BY c.created_at DESC
+    LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
+  `;
   params.push(limit, offset);
   
-  const countQuery = `SELECT COUNT(*) as total FROM comments${status && status !== 'all' ? ` WHERE status = '${status}'` : ''}`;
+  // 使用参数化查询避免 SQL 注入
+  const countParams = status && status !== 'all' ? [status] : [];
+  const countQuery = status && status !== 'all' 
+    ? 'SELECT COUNT(*) as total FROM comments WHERE status = $1'
+    : 'SELECT COUNT(*) as total FROM comments';
   
   const [commentsResult, countResult] = await Promise.all([
     sql.query<Comment>(query, params),
-    sql.query<{ total: string }>(countQuery, []),
+    sql.query<{ total: string }>(countQuery, countParams),
   ]);
   
   return {
