@@ -176,18 +176,29 @@ export async function getPosts({
     ? 'WHERE ' + whereConditions.join(' AND ')
     : '';
 
-  // 主查询
+  // 主查询 - 使用子查询获取 categories 和 tags
   const query = `
-    SELECT DISTINCT p.*,
-      COALESCE(json_agg(DISTINCT jsonb_build_object('id', c.id, 'name', c.name, 'slug', c.slug)) FILTER (WHERE c.id IS NOT NULL), '[]') as categories,
-      COALESCE(json_agg(DISTINCT jsonb_build_object('id', t.id, 'name', t.name, 'slug', t.slug)) FILTER (WHERE t.id IS NOT NULL), '[]') as tags
+    SELECT p.*,
+      COALESCE(
+        (SELECT json_agg(jsonb_build_object('id', c.id, 'name', c.name, 'slug', c.slug))
+         FROM post_categories pc2
+         JOIN categories c ON pc2.category_id = c.id
+         WHERE pc2.post_id = p.id), '[]') as categories,
+      COALESCE(
+        (SELECT json_agg(jsonb_build_object('id', t.id, 'name', t.name, 'slug', t.slug))
+         FROM post_tags pt2
+         JOIN tags t ON pt2.tag_id = t.id
+         WHERE pt2.post_id = p.id), '[]') as tags
     FROM posts p
-    LEFT JOIN post_categories pc ON p.id = pc.post_id
-    LEFT JOIN categories c ON pc.category_id = c.id
-    LEFT JOIN post_tags pt ON p.id = pt.post_id
-    LEFT JOIN tags t ON pt.tag_id = t.id
-    ${whereClause}
-    GROUP BY p.id
+    WHERE p.id IN (
+      SELECT DISTINCT p2.id
+      FROM posts p2
+      LEFT JOIN post_categories pc ON p2.id = pc.post_id
+      LEFT JOIN categories c ON pc.category_id = c.id
+      LEFT JOIN post_tags pt ON p2.id = pt.post_id
+      LEFT JOIN tags t ON pt.tag_id = t.id
+      ${whereClause}
+    )
     ORDER BY p.published_at DESC NULLS LAST, p.created_at DESC
     LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
   `;
@@ -225,15 +236,18 @@ export async function getPostBySlug(slug: string): Promise<(Post & { categories:
     }
   >`
     SELECT p.*,
-      COALESCE(json_agg(DISTINCT jsonb_build_object('id', c.id, 'name', c.name, 'slug', c.slug)) FILTER (WHERE c.id IS NOT NULL), '[]') as categories,
-      COALESCE(json_agg(DISTINCT jsonb_build_object('id', t.id, 'name', t.name, 'slug', t.slug)) FILTER (WHERE t.id IS NOT NULL), '[]') as tags
+      COALESCE(
+        (SELECT json_agg(jsonb_build_object('id', c.id, 'name', c.name, 'slug', c.slug))
+         FROM post_categories pc2
+         JOIN categories c ON pc2.category_id = c.id
+         WHERE pc2.post_id = p.id), '[]') as categories,
+      COALESCE(
+        (SELECT json_agg(jsonb_build_object('id', t.id, 'name', t.name, 'slug', t.slug))
+         FROM post_tags pt2
+         JOIN tags t ON pt2.tag_id = t.id
+         WHERE pt2.post_id = p.id), '[]') as tags
     FROM posts p
-    LEFT JOIN post_categories pc ON p.id = pc.post_id
-    LEFT JOIN categories c ON pc.category_id = c.id
-    LEFT JOIN post_tags pt ON p.id = pt.post_id
-    LEFT JOIN tags t ON pt.tag_id = t.id
     WHERE p.slug = ${slug} AND p.status = 'published'
-    GROUP BY p.id
   `;
 
   if (result.rows.length === 0) return null;
@@ -256,15 +270,18 @@ export async function getPostById(id: string): Promise<(Post & { categories: Cat
     }
   >`
     SELECT p.*,
-      COALESCE(json_agg(DISTINCT jsonb_build_object('id', c.id, 'name', c.name, 'slug', c.slug)) FILTER (WHERE c.id IS NOT NULL), '[]') as categories,
-      COALESCE(json_agg(DISTINCT jsonb_build_object('id', t.id, 'name', t.name, 'slug', t.slug)) FILTER (WHERE t.id IS NOT NULL), '[]') as tags
+      COALESCE(
+        (SELECT json_agg(jsonb_build_object('id', c.id, 'name', c.name, 'slug', c.slug))
+         FROM post_categories pc2
+         JOIN categories c ON pc2.category_id = c.id
+         WHERE pc2.post_id = p.id), '[]') as categories,
+      COALESCE(
+        (SELECT json_agg(jsonb_build_object('id', t.id, 'name', t.name, 'slug', t.slug))
+         FROM post_tags pt2
+         JOIN tags t ON pt2.tag_id = t.id
+         WHERE pt2.post_id = p.id), '[]') as tags
     FROM posts p
-    LEFT JOIN post_categories pc ON p.id = pc.post_id
-    LEFT JOIN categories c ON pc.category_id = c.id
-    LEFT JOIN post_tags pt ON p.id = pt.post_id
-    LEFT JOIN tags t ON pt.tag_id = t.id
     WHERE p.id = ${id}
-    GROUP BY p.id
   `;
 
   if (result.rows.length === 0) return null;
