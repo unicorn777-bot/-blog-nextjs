@@ -1,8 +1,8 @@
-﻿import { neon } from '@neondatabase/serverless';
+﻿import { neon, NeonQueryFunction } from '@neondatabase/serverless';
 import { unstable_noStore as noStore } from 'next/cache';
 
 // 创建数据库连接 - Neon 返回的是一个模板字符串标签函数
-const getSql = () => {
+const getSql = (): NeonQueryFunction<false, false> => {
   const connectionString = 
     process.env.DATABASE_URL_UNPOOLED ||
     process.env.POSTGRES_URL_NO_SSL ||
@@ -16,35 +16,40 @@ const getSql = () => {
 };
 
 // 缓存 SQL 实例
-let sqlInstance: ReturnType<typeof neon> | null = null;
+let sqlInstance: NeonQueryFunction<false, false> | null = null;
 
 // 获取 SQL 实例
-const getSqlInstance = () => {
+const getSqlInstance = (): NeonQueryFunction<false, false> => {
   if (!sqlInstance) {
     sqlInstance = getSql();
   }
   return sqlInstance;
 };
 
+// SQL 查询结果接口
+interface SqlResult<T> {
+  rows: T[];
+}
+
 // 创建兼容的 SQL 接口
 const sql = Object.assign(
   // 模板字符串调用: sql`SELECT * FROM table`
   // 返回 { rows: T[] } 格式以兼容代码中的使用方式
-  async <T = unknown>(strings: TemplateStringsArray, ...values: (string | number | boolean | Date | null | undefined)[]): Promise<{ rows: T[] }> => {
+  async <T = unknown>(strings: TemplateStringsArray, ...values: (string | number | boolean | Date | null | undefined)[]): Promise<SqlResult<T>> => {
     const instance = getSqlInstance();
     const result = await instance(strings, ...values);
     return { rows: result as T[] };
   },
   {
     // 普通查询调用: sql.query("SELECT * FROM table WHERE id = $1", [id])
-    query: async <T = unknown>(queryString: string, params: (string | number | boolean | null)[] = []): Promise<{ rows: T[] }> => {
+    query: async <T = unknown>(queryString: string, params: (string | number | boolean | null)[] = []): Promise<SqlResult<T>> => {
       const instance = getSqlInstance();
       // 使用 Neon 的 unsafe 方法执行带参数的查询
       const result = await instance.unsafe(queryString, params as string[]);
       return { rows: result as T[] };
     },
     // unsafe 方法
-    unsafe: async <T = unknown>(queryString: string, params: (string | number | boolean | null)[] = []): Promise<{ rows: T[] }> => {
+    unsafe: async <T = unknown>(queryString: string, params: (string | number | boolean | null)[] = []): Promise<SqlResult<T>> => {
       const instance = getSqlInstance();
       const result = await instance.unsafe(queryString, params as string[]);
       return { rows: result as T[] };
