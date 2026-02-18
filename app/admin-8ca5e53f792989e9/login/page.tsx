@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect, useCallback } from 'react';
 import { signIn } from 'next-auth/react';
@@ -112,21 +112,46 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center px-4">
-      <div className="max-w-md w-full">
-        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl p-8">
+    <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center px-4">
+      {/* 背景装饰 */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div 
+          className="absolute w-[500px] h-[500px] rounded-full opacity-20"
+          style={{
+            background: 'radial-gradient(circle, rgba(0, 255, 136, 0.3) 0%, transparent 70%)',
+            left: '10%',
+            top: '20%',
+          }}
+        />
+        <div 
+          className="absolute w-[400px] h-[400px] rounded-full opacity-15"
+          style={{
+            background: 'radial-gradient(circle, rgba(0, 212, 255, 0.3) 0%, transparent 70%)',
+            right: '10%',
+            bottom: '20%',
+          }}
+        />
+      </div>
+
+      <div className="max-w-md w-full relative z-10">
+        <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl shadow-2xl p-8">
+          {/* Logo 和标题 */}
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-2">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-[var(--neon-green)] to-[var(--neon-blue)] flex items-center justify-center">
+              <span className="text-[var(--bg-primary)] font-bold text-2xl">2</span>
+            </div>
+            <h1 className="text-2xl font-bold text-[var(--text-primary)] mb-2">
               管理后台
             </h1>
-            <p className="text-slate-600 dark:text-slate-400">
-              {process.env.NEXT_PUBLIC_SITE_NAME || '欢迎来到2037'}
+            <p className="text-[var(--text-muted)] text-sm">
+              请输入管理员账号密码登录
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* 邮箱输入 */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
                 邮箱
               </label>
               <input
@@ -136,14 +161,15 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 disabled={lockoutTime > 0}
-                className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-slate-700 dark:text-slate-100 disabled:opacity-50"
+                className="w-full px-4 py-3 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--neon-green)] focus:ring-1 focus:ring-[var(--neon-green)] transition-all disabled:opacity-50"
                 placeholder="请输入邮箱"
                 autoComplete="email"
               />
             </div>
 
+            {/* 密码输入 */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+              <label htmlFor="password" className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
                 密码
               </label>
               <input
@@ -153,17 +179,18 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 disabled={lockoutTime > 0}
-                className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-slate-700 dark:text-slate-100 disabled:opacity-50"
+                className="w-full px-4 py-3 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--neon-green)] focus:ring-1 focus:ring-[var(--neon-green)] transition-all disabled:opacity-50"
                 placeholder="请输入密码"
                 autoComplete="current-password"
               />
             </div>
 
+            {/* 验证码 */}
             <div>
-              <label htmlFor="captcha" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                验证码：{captchaData.question}
+              <label htmlFor="captcha" className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
+                验证码：<span className="text-[var(--neon-green)] font-mono">{captchaData.question}</span>
               </label>
-              <div className="flex gap-2">
+              <div className="flex gap-3">
                 <input
                   id="captcha"
                   type="number"
@@ -171,13 +198,13 @@ export default function LoginPage() {
                   onChange={(e) => setCaptcha(e.target.value)}
                   required
                   disabled={lockoutTime > 0}
-                  className="flex-1 px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-slate-700 dark:text-slate-100 disabled:opacity-50"
+                  className="flex-1 px-4 py-3 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--neon-green)] focus:ring-1 focus:ring-[var(--neon-green)] transition-all disabled:opacity-50"
                   placeholder="请输入答案"
                 />
                 <button
                   type="button"
                   onClick={refreshCaptcha}
-                  className="px-4 py-2 text-sm bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition"
+                  className="px-4 py-3 text-sm bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl text-[var(--text-secondary)] hover:text-[var(--neon-green)] hover:border-[var(--neon-green)] transition-all"
                   title="刷新验证码"
                 >
                   刷新
@@ -185,39 +212,43 @@ export default function LoginPage() {
               </div>
             </div>
 
+            {/* 错误提示 */}
             {error && (
-              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-lg">
+              <div className="bg-[rgba(255,0,128,0.1)] border border-[rgba(255,0,128,0.3)] text-[var(--neon-pink)] px-4 py-3 rounded-xl text-sm">
                 {error}
               </div>
             )}
 
+            {/* 锁定提示 */}
             {lockoutTime > 0 && (
-              <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 text-yellow-700 dark:text-yellow-400 px-4 py-3 rounded-lg">
+              <div className="bg-[rgba(255,107,53,0.1)] border border-[rgba(255,107,53,0.3)] text-[var(--neon-orange)] px-4 py-3 rounded-xl text-sm">
                 账户已锁定，剩余时间：{Math.floor(lockoutTime / 60)}分{lockoutTime % 60}秒
               </div>
             )}
 
+            {/* 登录按钮 */}
             <button
               type="submit"
               disabled={loading || lockoutTime > 0}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-3 px-4 bg-gradient-to-r from-[var(--neon-green)] to-[var(--neon-blue)] text-[var(--bg-primary)] font-semibold rounded-xl transition-all hover:shadow-[0_0_30px_rgba(0,255,136,0.4)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none"
             >
               {loading ? '登录中...' : lockoutTime > 0 ? '已锁定' : '登录'}
             </button>
           </form>
 
+          {/* 返回首页 */}
           <div className="mt-6 text-center">
             <Link
               href="/"
-              className="text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
+              className="text-sm text-[var(--text-muted)] hover:text-[var(--neon-green)] transition-colors"
             >
-              返回首页
+              ← 返回首页
             </Link>
           </div>
         </div>
         
         {/* 安全提示 */}
-        <div className="mt-4 text-center text-xs text-slate-500 dark:text-slate-400">
+        <div className="mt-4 text-center text-xs text-[var(--text-muted)]">
           <p>连续登录失败5次将被锁定15分钟</p>
         </div>
       </div>
