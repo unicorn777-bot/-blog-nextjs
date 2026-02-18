@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
 
@@ -50,10 +50,10 @@ export default function MigrationTool() {
       {/* Message */}
       {message && (
         <div
-          className={`px-4 py-3 rounded-lg ${
+          className={`px-4 py-3 rounded-xl ${
             message.includes('成功') || message.includes('完成')
-              ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800'
-              : 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800'
+              ? 'bg-[rgba(0,255,136,0.1)] border border-[rgba(0,255,136,0.3)] text-[var(--neon-green)]'
+              : 'bg-[rgba(255,0,128,0.1)] border border-[rgba(255,0,128,0.3)] text-[var(--neon-pink)]'
           }`}
         >
           {message}
@@ -61,16 +61,16 @@ export default function MigrationTool() {
       )}
 
       {/* Migration Form */}
-      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6">
-        <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-4">
+      <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-6">
+        <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-4">
           从 Hexo 迁移数据
         </h2>
 
-        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
-          <h3 className="font-medium text-blue-900 dark:text-blue-100 mb-2">
+        <div className="bg-[rgba(0,212,255,0.1)] border border-[rgba(0,212,255,0.3)] rounded-xl p-4 mb-6">
+          <h3 className="font-medium text-[var(--neon-blue)] mb-2">
             迁移说明
           </h3>
-          <ul className="text-sm text-blue-800 dark:text-blue-200 space-y-1">
+          <ul className="text-sm text-[var(--text-secondary)] space-y-1">
             <li>• 将 Hexo 博客的相对路径填入下方</li>
             <li>• 提供管理员邮箱地址</li>
             <li>• 迁移将包含：文章、分类、标签</li>
@@ -80,7 +80,7 @@ export default function MigrationTool() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
               Hexo 博客路径（相对路径）
             </label>
             <input
@@ -89,12 +89,12 @@ export default function MigrationTool() {
               onChange={(e) => setFormData({ ...formData, hexoPath: e.target.value })}
               required
               placeholder="../my-blog"
-              className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-slate-100"
+              className="w-full px-4 py-3 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--neon-green)] focus:ring-1 focus:ring-[var(--neon-green)] transition-all"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
               管理员邮箱
             </label>
             <input
@@ -103,14 +103,14 @@ export default function MigrationTool() {
               onChange={(e) => setFormData({ ...formData, authorEmail: e.target.value })}
               required
               placeholder="admin@example.com"
-              className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-slate-100"
+              className="w-full px-4 py-3 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--neon-green)] focus:ring-1 focus:ring-[var(--neon-green)] transition-all"
             />
           </div>
 
           <button
             type="submit"
             disabled={migrating}
-            className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition disabled:opacity-50"
+            className="px-6 py-3 bg-gradient-to-r from-[var(--neon-green)] to-[var(--neon-blue)] text-[var(--bg-primary)] font-medium rounded-xl transition-all hover:shadow-[0_0_20px_rgba(0,255,136,0.3)] disabled:opacity-50"
           >
             {migrating ? '迁移中...' : '开始迁移'}
           </button>
@@ -119,14 +119,14 @@ export default function MigrationTool() {
 
       {/* Results */}
       {results && (
-        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-4">
+        <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-6">
+          <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-4">
             迁移结果
           </h2>
 
           <div className="space-y-4">
             <div>
-              <h3 className="font-medium text-slate-900 dark:text-slate-100 mb-2">
+              <h3 className="font-medium text-[var(--text-primary)] mb-2">
                 成功迁移 ({results.posts?.length || 0})
               </h3>
               {results.posts && results.posts.length > 0 && (
@@ -134,7 +134,7 @@ export default function MigrationTool() {
                   {results.posts.map((post, idx) => (
                     <li
                       key={idx}
-                      className="text-sm text-green-700 dark:text-green-400"
+                      className="text-sm text-[var(--neon-green)]"
                     >
                       ✓ {post}
                     </li>
@@ -145,14 +145,14 @@ export default function MigrationTool() {
 
             {results.errors && results.errors.length > 0 && (
               <div>
-                <h3 className="font-medium text-slate-900 dark:text-slate-100 mb-2">
+                <h3 className="font-medium text-[var(--text-primary)] mb-2">
                   失败 ({results.errors.length})
                 </h3>
                 <ul className="space-y-1">
                   {results.errors.map((error, idx) => (
                     <li
                       key={idx}
-                      className="text-sm text-red-700 dark:text-red-400"
+                      className="text-sm text-[var(--neon-pink)]"
                     >
                       ✗ {error}
                     </li>

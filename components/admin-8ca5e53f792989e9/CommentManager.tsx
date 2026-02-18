@@ -85,10 +85,10 @@ export default function CommentManager() {
 
   const getStatusBadge = (status: string) => {
     const styles: Record<string, string> = {
-      pending: 'bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-300',
-      approved: 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300',
-      spam: 'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300',
-      trash: 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300',
+      pending: 'bg-[rgba(255,107,53,0.2)] text-[var(--neon-orange)]',
+      approved: 'bg-[rgba(0,255,136,0.2)] text-[var(--neon-green)]',
+      spam: 'bg-[rgba(255,0,128,0.2)] text-[var(--neon-pink)]',
+      trash: 'bg-[var(--bg-tertiary)] text-[var(--text-muted)]',
     };
     const labels: Record<string, string> = {
       pending: '待审核',
@@ -104,16 +104,16 @@ export default function CommentManager() {
   };
 
   if (loading) {
-    return <div className="text-center py-8">加载中...</div>;
+    return <div className="text-center py-8 text-[var(--text-muted)]">加载中...</div>;
   }
 
   return (
     <div className="space-y-6">
       {message && (
-        <div className={`px-4 py-3 rounded-lg ${
+        <div className={`px-4 py-3 rounded-xl ${
           message.includes('成功') || message.includes('已删除')
-            ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400'
-            : 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400'
+            ? 'bg-[rgba(0,255,136,0.1)] border border-[rgba(0,255,136,0.3)] text-[var(--neon-green)]'
+            : 'bg-[rgba(255,0,128,0.1)] border border-[rgba(255,0,128,0.3)] text-[var(--neon-pink)]'
         }`}>
           {message}
         </div>
@@ -125,10 +125,10 @@ export default function CommentManager() {
           <button
             key={s}
             onClick={() => { setStatusFilter(s); setPage(1); }}
-            className={`px-4 py-2 rounded-lg transition ${
+            className={`px-4 py-2 rounded-xl transition-all ${
               statusFilter === s
-                ? 'bg-blue-600 text-white'
-                : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
+                ? 'bg-gradient-to-r from-[var(--neon-green)] to-[var(--neon-blue)] text-[var(--bg-primary)]'
+                : 'bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-secondary)] hover:border-[var(--neon-green)] hover:text-[var(--neon-green)]'
             }`}
           >
             {s === 'all' ? '全部' : s === 'pending' ? '待审核' : s === 'approved' ? '已通过' : s === 'spam' ? '垃圾' : '回收站'}
@@ -137,32 +137,32 @@ export default function CommentManager() {
       </div>
 
       {/* 评论列表 */}
-      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md">
+      <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl">
         {comments.length === 0 ? (
-          <div className="text-center py-8 text-slate-600 dark:text-slate-400">
+          <div className="text-center py-8 text-[var(--text-muted)]">
             暂无评论
           </div>
         ) : (
-          <div className="divide-y divide-slate-200 dark:divide-slate-700">
+          <div className="divide-y divide-[var(--border-color)]">
             {comments.map((comment) => (
               <div key={comment.id} className="p-4">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="font-medium text-slate-900 dark:text-slate-100">
+                      <span className="font-medium text-[var(--text-primary)]">
                         {comment.author_name}
                       </span>
                       {comment.author_email && (
-                        <span className="text-sm text-slate-500">
+                        <span className="text-sm text-[var(--text-muted)]">
                           ({comment.author_email})
                         </span>
                       )}
                       {getStatusBadge(comment.status)}
                     </div>
-                    <p className="text-slate-700 dark:text-slate-300 mb-2 whitespace-pre-wrap">
+                    <p className="text-[var(--text-secondary)] mb-2 whitespace-pre-wrap">
                       {comment.content}
                     </p>
-                    <div className="flex items-center gap-4 text-sm text-slate-500">
+                    <div className="flex items-center gap-4 text-sm text-[var(--text-muted)]">
                       <span>{formatDate(comment.created_at)}</span>
                       {comment.post_title && (
                         <span>文章: {comment.post_title}</span>
@@ -173,7 +173,7 @@ export default function CommentManager() {
                     {comment.status !== 'approved' && (
                       <button
                         onClick={() => handleStatusChange(comment.id, 'approved')}
-                        className="px-3 py-1 text-sm bg-green-600 hover:bg-green-700 text-white rounded transition"
+                        className="px-3 py-1.5 text-sm bg-[var(--neon-green)] hover:opacity-80 text-[var(--bg-primary)] rounded-lg transition"
                       >
                         通过
                       </button>
@@ -181,14 +181,14 @@ export default function CommentManager() {
                     {comment.status !== 'spam' && (
                       <button
                         onClick={() => handleStatusChange(comment.id, 'spam')}
-                        className="px-3 py-1 text-sm bg-orange-600 hover:bg-orange-700 text-white rounded transition"
+                        className="px-3 py-1.5 text-sm bg-[var(--neon-orange)] hover:opacity-80 text-[var(--bg-primary)] rounded-lg transition"
                       >
                         垃圾
                       </button>
                     )}
                     <button
                       onClick={() => handleDelete(comment.id)}
-                      className="px-3 py-1 text-sm bg-red-600 hover:bg-red-700 text-white rounded transition"
+                      className="px-3 py-1.5 text-sm bg-[var(--neon-pink)] hover:opacity-80 text-[var(--bg-primary)] rounded-lg transition"
                     >
                       删除
                     </button>
@@ -206,17 +206,17 @@ export default function CommentManager() {
           <button
             onClick={() => setPage(p => Math.max(1, p - 1))}
             disabled={page === 1}
-            className="px-4 py-2 bg-slate-100 dark:bg-slate-700 rounded-lg disabled:opacity-50"
+            className="px-4 py-2 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl disabled:opacity-50 hover:border-[var(--neon-green)] transition-all"
           >
             上一页
           </button>
-          <span className="px-4 py-2">
+          <span className="px-4 py-2 text-[var(--text-secondary)]">
             {page} / {totalPages}
           </span>
           <button
             onClick={() => setPage(p => Math.min(totalPages, p + 1))}
             disabled={page === totalPages}
-            className="px-4 py-2 bg-slate-100 dark:bg-slate-700 rounded-lg disabled:opacity-50"
+            className="px-4 py-2 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl disabled:opacity-50 hover:border-[var(--neon-green)] transition-all"
           >
             下一页
           </button>

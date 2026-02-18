@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect } from 'react';
 import { signOut } from 'next-auth/react';
@@ -45,29 +45,34 @@ export default function AdminDashboard() {
   ] as const;
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
+    <div className="min-h-screen bg-[var(--bg-primary)]">
       {/* Header */}
-      <header className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-50">
+      <header className="bg-[var(--bg-secondary)] border-b border-[var(--border-color)] sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-              管理后台
-            </h1>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--neon-green)] to-[var(--neon-blue)] flex items-center justify-center">
+                <span className="text-[var(--bg-primary)] font-bold text-lg">2</span>
+              </div>
+              <h1 className="text-xl font-bold text-[var(--text-primary)]">
+                管理后台
+              </h1>
+            </div>
             <div className="flex items-center gap-4">
               {user && (
-                <span className="text-sm text-slate-600 dark:text-slate-400">
+                <span className="text-sm text-[var(--text-muted)]">
                   {user.name} ({user.role})
                 </span>
               )}
               <Link
                 href="/"
-                className="px-4 py-2 bg-slate-600 hover:bg-slate-700 text-white text-sm font-medium rounded-lg transition"
+                className="px-4 py-2 bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] text-sm font-medium rounded-lg hover:border-[var(--neon-green)] hover:text-[var(--neon-green)] transition-all"
               >
                 查看网站
               </Link>
               <button
                 onClick={handleLogout}
-                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition"
+                className="px-4 py-2 bg-[rgba(255,0,128,0.2)] border border-[rgba(255,0,128,0.3)] text-[var(--neon-pink)] text-sm font-medium rounded-lg hover:bg-[rgba(255,0,128,0.3)] transition-all"
               >
                 退出登录
               </button>
@@ -77,7 +82,7 @@ export default function AdminDashboard() {
       </header>
 
       {/* Tabs */}
-      <div className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
+      <div className="bg-[var(--bg-secondary)] border-b border-[var(--border-color)]">
         <div className="container mx-auto px-4">
           <nav className="flex gap-1 overflow-x-auto">
             {tabs.map((tab) => (
@@ -86,8 +91,8 @@ export default function AdminDashboard() {
                 onClick={() => setActiveTab(tab.key)}
                 className={`px-4 py-3 text-sm font-medium transition whitespace-nowrap ${
                   activeTab === tab.key
-                    ? 'text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
+                    ? 'text-[var(--neon-green)] border-b-2 border-[var(--neon-green)]'
+                    : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
                 }`}
               >
                 {tab.label}

@@ -87,17 +87,17 @@ export default function CommentSection({ postId }: CommentSectionProps) {
   const renderComment = (comment: Comment, depth = 0) => (
     <div 
       key={comment.id} 
-      className={`${depth > 0 ? 'ml-8 border-l-2 border-slate-200 dark:border-slate-700 pl-4' : ''} mb-4`}
+      className={`${depth > 0 ? 'ml-8 border-l-2 border-[var(--border-color)] pl-4' : ''} mb-4`}
     >
-      <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-4">
+      <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl p-4">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[var(--neon-green)] to-[var(--neon-blue)] flex items-center justify-center text-[var(--bg-primary)] font-bold text-sm">
               {comment.author_name.charAt(0).toUpperCase()}
             </div>
-            <span className="font-medium text-slate-900 dark:text-slate-100">
+            <span className="font-medium text-[var(--text-primary)]">
               {comment.author_url ? (
-                <a href={comment.author_url} target="_blank" rel="noopener noreferrer" className="hover:text-blue-600">
+                <a href={comment.author_url} target="_blank" rel="noopener noreferrer" className="hover:text-[var(--neon-green)] transition-colors">
                   {comment.author_name}
                 </a>
               ) : (
@@ -105,16 +105,16 @@ export default function CommentSection({ postId }: CommentSectionProps) {
               )}
             </span>
           </div>
-          <time className="text-sm text-slate-500">
+          <time className="text-sm text-[var(--text-muted)]">
             {formatDate(comment.created_at)}
           </time>
         </div>
-        <p className="text-slate-700 dark:text-slate-300 whitespace-pre-wrap">
+        <p className="text-[var(--text-secondary)] whitespace-pre-wrap">
           {comment.content}
         </p>
         <button
           onClick={() => setReplyingTo(replyingTo === comment.id ? null : comment.id)}
-          className="mt-2 text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400"
+          className="mt-2 text-sm text-[var(--neon-green)] hover:text-[var(--neon-blue)] transition-colors"
         >
           {replyingTo === comment.id ? '取消回复' : '回复'}
         </button>
@@ -128,20 +128,20 @@ export default function CommentSection({ postId }: CommentSectionProps) {
             placeholder="写下你的回复..."
             required
             rows={3}
-            className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-slate-100 text-sm"
+            className="w-full px-4 py-3 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--neon-green)] focus:ring-1 focus:ring-[var(--neon-green)] transition-all text-sm"
           />
           <div className="flex gap-2 mt-2">
             <button
               type="submit"
               disabled={submitting}
-              className="px-4 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition disabled:opacity-50"
+              className="px-4 py-2 bg-gradient-to-r from-[var(--neon-green)] to-[var(--neon-blue)] text-[var(--bg-primary)] text-sm font-medium rounded-lg transition-all hover:shadow-[0_0_20px_rgba(0,255,136,0.3)] disabled:opacity-50"
             >
               {submitting ? '提交中...' : '提交回复'}
             </button>
             <button
               type="button"
               onClick={() => setReplyingTo(null)}
-              className="px-4 py-1 bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-300 text-sm rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500 transition"
+              className="px-4 py-2 bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-secondary)] text-sm rounded-lg hover:text-[var(--text-primary)] hover:border-[var(--neon-green)] transition-all"
             >
               取消
             </button>
@@ -158,26 +158,26 @@ export default function CommentSection({ postId }: CommentSectionProps) {
   );
 
   if (loading) {
-    return <div className="text-center py-8">加载评论中...</div>;
+    return <div className="text-center py-8 text-[var(--text-muted)]">加载评论中...</div>;
   }
 
   return (
     <div className="mt-12">
-      <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-6">
+      <h3 className="text-2xl font-bold text-[var(--text-primary)] mb-6">
         评论 ({comments.length})
       </h3>
 
       {/* 评论表单 */}
-      <form onSubmit={(e) => handleSubmit(e)} className="mb-8 bg-slate-50 dark:bg-slate-800 rounded-lg p-6">
-        <h4 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4">
+      <form onSubmit={(e) => handleSubmit(e)} className="mb-8 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-6">
+        <h4 className="text-lg font-semibold text-[var(--text-primary)] mb-4">
           发表评论
         </h4>
 
         {message && (
-          <div className={`mb-4 px-4 py-3 rounded-lg ${
+          <div className={`mb-4 px-4 py-3 rounded-xl ${
             message.includes('成功') || message.includes('等待审核')
-              ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800'
-              : 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800'
+              ? 'bg-[rgba(0,255,136,0.1)] border border-[rgba(0,255,136,0.3)] text-[var(--neon-green)]'
+              : 'bg-[rgba(255,0,128,0.1)] border border-[rgba(255,0,128,0.3)] text-[var(--neon-pink)]'
           }`}>
             {message}
           </div>
@@ -185,7 +185,7 @@ export default function CommentSection({ postId }: CommentSectionProps) {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
               姓名 *
             </label>
             <input
@@ -193,35 +193,35 @@ export default function CommentSection({ postId }: CommentSectionProps) {
               value={formData.author_name}
               onChange={(e) => setFormData({ ...formData, author_name: e.target.value })}
               required
-              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-slate-100"
+              className="w-full px-4 py-3 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--neon-green)] focus:ring-1 focus:ring-[var(--neon-green)] transition-all"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
               邮箱
             </label>
             <input
               type="email"
               value={formData.author_email}
               onChange={(e) => setFormData({ ...formData, author_email: e.target.value })}
-              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-slate-100"
+              className="w-full px-4 py-3 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--neon-green)] focus:ring-1 focus:ring-[var(--neon-green)] transition-all"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
               网站
             </label>
             <input
               type="url"
               value={formData.author_url}
               onChange={(e) => setFormData({ ...formData, author_url: e.target.value })}
-              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-slate-100"
+              className="w-full px-4 py-3 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--neon-green)] focus:ring-1 focus:ring-[var(--neon-green)] transition-all"
             />
           </div>
         </div>
 
         <div className="mb-4">
-          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+          <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
             评论内容 *
           </label>
           <textarea
@@ -231,9 +231,9 @@ export default function CommentSection({ postId }: CommentSectionProps) {
             rows={4}
             maxLength={2000}
             placeholder="写下你的评论..."
-            className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-slate-100"
+            className="w-full px-4 py-3 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--neon-green)] focus:ring-1 focus:ring-[var(--neon-green)] transition-all resize-none"
           />
-          <p className="text-xs text-slate-500 mt-1">
+          <p className="text-xs text-[var(--text-muted)] mt-2">
             {formData.content.length}/2000 字符
           </p>
         </div>
@@ -241,18 +241,18 @@ export default function CommentSection({ postId }: CommentSectionProps) {
         <button
           type="submit"
           disabled={submitting}
-          className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition disabled:opacity-50"
+          className="px-6 py-3 bg-gradient-to-r from-[var(--neon-green)] to-[var(--neon-blue)] text-[var(--bg-primary)] font-semibold rounded-xl transition-all hover:shadow-[0_0_30px_rgba(0,255,136,0.4)] disabled:opacity-50"
         >
           {submitting ? '提交中...' : '提交评论'}
         </button>
-        <p className="text-xs text-slate-500 mt-2">
+        <p className="text-xs text-[var(--text-muted)] mt-3">
           * 评论需要审核后才会显示
         </p>
       </form>
 
       {/* 评论列表 */}
       {comments.length === 0 ? (
-        <div className="text-center py-8 text-slate-600 dark:text-slate-400">
+        <div className="text-center py-8 text-[var(--text-muted)]">
           暂无评论，快来发表第一条评论吧！
         </div>
       ) : (

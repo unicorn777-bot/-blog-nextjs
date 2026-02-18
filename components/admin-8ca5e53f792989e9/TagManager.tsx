@@ -61,7 +61,7 @@ export default function TagManager() {
   };
 
   if (loading) {
-    return <div className="text-center py-8">加载中...</div>;
+    return <div className="text-center py-8 text-[var(--text-muted)]">加载中...</div>;
   }
 
   return (
@@ -69,10 +69,10 @@ export default function TagManager() {
       {/* Message */}
       {message && (
         <div
-          className={`px-4 py-3 rounded-lg ${
+          className={`px-4 py-3 rounded-xl ${
             message.includes('成功')
-              ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800'
-              : 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800'
+              ? 'bg-[rgba(0,255,136,0.1)] border border-[rgba(0,255,136,0.3)] text-[var(--neon-green)]'
+              : 'bg-[rgba(255,0,128,0.1)] border border-[rgba(255,0,128,0.3)] text-[var(--neon-pink)]'
           }`}
         >
           {message}
@@ -80,14 +80,14 @@ export default function TagManager() {
       )}
 
       {/* Create Tag */}
-      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6">
-        <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-4">
+      <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-6">
+        <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-4">
           创建标签
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
               标签名称
             </label>
             <input
@@ -95,14 +95,14 @@ export default function TagManager() {
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               required
-              className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-slate-100"
+              className="w-full px-4 py-3 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--neon-green)] focus:ring-1 focus:ring-[var(--neon-green)] transition-all"
             />
           </div>
 
           <button
             type="submit"
             disabled={saving}
-            className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition disabled:opacity-50"
+            className="px-6 py-3 bg-gradient-to-r from-[var(--neon-green)] to-[var(--neon-blue)] text-[var(--bg-primary)] font-medium rounded-xl transition-all hover:shadow-[0_0_20px_rgba(0,255,136,0.3)] disabled:opacity-50"
           >
             {saving ? '创建中...' : '创建标签'}
           </button>
@@ -110,13 +110,13 @@ export default function TagManager() {
       </div>
 
       {/* Tags List */}
-      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6">
-        <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-4">
+      <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-6">
+        <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-4">
           标签列表 ({tags.length})
         </h2>
 
         {tags.length === 0 ? (
-          <p className="text-slate-600 dark:text-slate-400 text-center py-8">
+          <p className="text-[var(--text-muted)] text-center py-8">
             暂无标签
           </p>
         ) : (
@@ -124,12 +124,12 @@ export default function TagManager() {
             {tags.map((tag) => (
               <div
                 key={tag.id}
-                className="px-4 py-2 bg-slate-50 dark:bg-slate-700 rounded-full"
+                className="px-4 py-2 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-full"
               >
-                <span className="text-slate-900 dark:text-slate-100 font-medium">
+                <span className="text-[var(--text-primary)] font-medium">
                   #{tag.name}
                 </span>
-                <span className="ml-2 text-sm text-slate-500 dark:text-slate-500">
+                <span className="ml-2 text-sm text-[var(--text-muted)]">
                   {tag.slug}
                 </span>
               </div>

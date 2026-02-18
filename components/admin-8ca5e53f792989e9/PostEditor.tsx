@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect } from 'react';
 
@@ -137,7 +137,7 @@ export default function PostEditor() {
   };
 
   if (loading) {
-    return <div className="text-center py-8">加载中...</div>;
+    return <div className="text-center py-8 text-[var(--text-muted)]">加载中...</div>;
   }
 
   return (
@@ -145,10 +145,10 @@ export default function PostEditor() {
       {/* Message */}
       {message && (
         <div
-          className={`px-4 py-3 rounded-lg ${
+          className={`px-4 py-3 rounded-xl ${
             message.includes('成功')
-              ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800'
-              : 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800'
+              ? 'bg-[rgba(0,255,136,0.1)] border border-[rgba(0,255,136,0.3)] text-[var(--neon-green)]'
+              : 'bg-[rgba(255,0,128,0.1)] border border-[rgba(255,0,128,0.3)] text-[var(--neon-pink)]'
           }`}
         >
           {message}
@@ -156,15 +156,15 @@ export default function PostEditor() {
       )}
 
       {/* Editor */}
-      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6">
+      <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-6">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
+          <h2 className="text-xl font-semibold text-[var(--text-primary)]">
             {editingPost ? '编辑文章' : '创建文章'}
           </h2>
           {!editingPost && (
             <button
               onClick={handleCreate}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition"
+              className="px-4 py-2 bg-gradient-to-r from-[var(--neon-green)] to-[var(--neon-blue)] text-[var(--bg-primary)] rounded-lg font-medium transition-all hover:shadow-[0_0_20px_rgba(0,255,136,0.3)]"
             >
               新建文章
             </button>
@@ -173,7 +173,7 @@ export default function PostEditor() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
               标题
             </label>
             <input
@@ -181,12 +181,12 @@ export default function PostEditor() {
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               required
-              className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-slate-100"
+              className="w-full px-4 py-3 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--neon-green)] focus:ring-1 focus:ring-[var(--neon-green)] transition-all"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
               内容 (Markdown)
             </label>
             <textarea
@@ -194,42 +194,42 @@ export default function PostEditor() {
               onChange={(e) => setFormData({ ...formData, content: e.target.value })}
               required
               rows={12}
-              className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-slate-100 font-mono"
+              className="w-full px-4 py-3 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--neon-green)] focus:ring-1 focus:ring-[var(--neon-green)] transition-all font-mono resize-none"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
               摘要
             </label>
             <textarea
               value={formData.excerpt}
               onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
               rows={2}
-              className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-slate-100"
+              className="w-full px-4 py-3 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--neon-green)] focus:ring-1 focus:ring-[var(--neon-green)] transition-all resize-none"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
               封面图片 URL
             </label>
             <input
               type="text"
               value={formData.cover_image}
               onChange={(e) => setFormData({ ...formData, cover_image: e.target.value })}
-              className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-slate-100"
+              className="w-full px-4 py-3 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--neon-green)] focus:ring-1 focus:ring-[var(--neon-green)] transition-all"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
               状态
             </label>
             <select
               value={formData.status}
               onChange={(e) => setFormData({ ...formData, status: e.target.value as PostStatus })}
-              className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-slate-100"
+              className="w-full px-4 py-3 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl text-[var(--text-primary)] focus:outline-none focus:border-[var(--neon-green)] focus:ring-1 focus:ring-[var(--neon-green)] transition-all"
             >
               <option value="draft">草稿</option>
               <option value="published">已发布</option>
@@ -241,7 +241,7 @@ export default function PostEditor() {
             <button
               type="submit"
               disabled={saving}
-              className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition disabled:opacity-50"
+              className="px-6 py-3 bg-gradient-to-r from-[var(--neon-green)] to-[var(--neon-blue)] text-[var(--bg-primary)] font-medium rounded-xl transition-all hover:shadow-[0_0_20px_rgba(0,255,136,0.3)] disabled:opacity-50"
             >
               {saving ? '保存中...' : editingPost ? '更新' : '创建'}
             </button>
@@ -258,7 +258,7 @@ export default function PostEditor() {
                     status: 'draft',
                   });
                 }}
-                className="px-6 py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-lg transition"
+                className="px-6 py-3 bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-primary)] rounded-xl hover:border-[var(--neon-green)] transition-all"
               >
                 取消
               </button>
@@ -268,13 +268,13 @@ export default function PostEditor() {
       </div>
 
       {/* Posts List */}
-      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6">
-        <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-4">
+      <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-6">
+        <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-4">
           文章列表 ({posts.length})
         </h2>
 
         {posts.length === 0 ? (
-          <p className="text-slate-600 dark:text-slate-400 text-center py-8">
+          <p className="text-[var(--text-muted)] text-center py-8">
             暂无文章
           </p>
         ) : (
@@ -282,20 +282,20 @@ export default function PostEditor() {
             {posts.map((post) => (
               <div
                 key={post.id}
-                className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-700 rounded-lg"
+                className="flex items-center justify-between p-4 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl"
               >
                 <div className="flex-1">
-                  <h3 className="font-medium text-slate-900 dark:text-slate-100">
+                  <h3 className="font-medium text-[var(--text-primary)]">
                     {post.title}
                   </h3>
-                  <div className="flex items-center gap-3 mt-1 text-sm text-slate-600 dark:text-slate-400">
+                  <div className="flex items-center gap-3 mt-1 text-sm text-[var(--text-muted)]">
                     <span
                       className={`px-2 py-0.5 rounded text-xs ${
                         post.status === 'published'
-                          ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300'
+                          ? 'bg-[rgba(0,255,136,0.2)] text-[var(--neon-green)]'
                           : post.status === 'draft'
-                          ? 'bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-300'
-                          : 'bg-slate-100 dark:bg-slate-600 text-slate-700 dark:text-slate-300'
+                          ? 'bg-[rgba(255,107,53,0.2)] text-[var(--neon-orange)]'
+                          : 'bg-[var(--bg-secondary)] text-[var(--text-muted)]'
                       }`}
                     >
                       {getStatusText(post.status)}
@@ -306,13 +306,13 @@ export default function PostEditor() {
                 <div className="flex gap-2">
                   <button
                     onClick={() => handleEdit(post)}
-                    className="px-3 py-1 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded transition"
+                    className="px-3 py-1.5 text-sm bg-[var(--neon-blue)] hover:opacity-80 text-[var(--bg-primary)] rounded-lg transition"
                   >
                     编辑
                   </button>
                   <button
                     onClick={() => handleDelete(post)}
-                    className="px-3 py-1 text-sm bg-red-600 hover:bg-red-700 text-white rounded transition"
+                    className="px-3 py-1.5 text-sm bg-[var(--neon-pink)] hover:opacity-80 text-[var(--bg-primary)] rounded-lg transition"
                   >
                     删除
                   </button>
