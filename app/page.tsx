@@ -72,7 +72,7 @@ function EmptyState() {
       
       {/* 按钮 */}
       <Link
-        href="/admin"
+        href="/admin-8ca5e53f792989e9"
         className="btn-primary flex items-center gap-2"
       >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -251,7 +251,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ p
                 <SearchWrapper />
                 <ThemeToggle />
                 <Link
-                  href="/admin"
+                  href="/admin-8ca5e53f792989e9"
                   className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-[var(--neon-green)] to-[var(--neon-blue)] text-[var(--bg-primary)] font-medium transition-all hover:shadow-[0_0_20px_rgba(0,255,136,0.4)]"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

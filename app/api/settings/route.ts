@@ -4,9 +4,18 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { z } from 'zod';
 
-// 获取网站配置
+// 获取网站配置（需要认证）
 export async function GET() {
   try {
+    const session = await getServerSession(authOptions);
+
+    if (!session || !session.user) {
+      return NextResponse.json(
+        { error: '未授权' },
+        { status: 401 }
+      );
+    }
+
     const settings = await getSettings();
     return NextResponse.json(settings);
   } catch (error) {

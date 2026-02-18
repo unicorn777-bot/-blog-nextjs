@@ -37,7 +37,7 @@ export default function PostEditor() {
 
   const fetchPosts = async () => {
     try {
-      const response = await fetch('/api/admin/posts');
+      const response = await fetch('/api/admin-8ca5e53f792989e9/posts');
       const data = await response.json();
       setPosts(data.posts);
     } catch (error) {

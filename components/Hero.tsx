@@ -186,7 +186,7 @@ export default function Hero({ title, description }: HeroProps) {
             </svg>
           </Link>
           <Link 
-            href="/admin" 
+            href="/admin-8ca5e53f792989e9" 
             className="btn-secondary flex items-center gap-2"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

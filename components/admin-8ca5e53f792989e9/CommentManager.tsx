@@ -32,7 +32,7 @@ export default function CommentManager() {
   const fetchComments = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`/api/admin/comments?status=${statusFilter}&page=${page}&limit=10`);
+      const response = await fetch(`/api/admin-8ca5e53f792989e9/comments?status=${statusFilter}&page=${page}&limit=10`);
       const data = await response.json();
       setComments(data.comments || []);
       setTotalPages(data.pagination?.totalPages || 1);
@@ -45,7 +45,7 @@ export default function CommentManager() {
 
   const handleStatusChange = async (id: string, status: CommentStatus) => {
     try {
-      const response = await fetch(`/api/admin/comments/${id}`, {
+      const response = await fetch(`/api/admin-8ca5e53f792989e9/comments/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status }),
@@ -67,7 +67,7 @@ export default function CommentManager() {
     if (!confirm('确定要删除这条评论吗？')) return;
 
     try {
-      const response = await fetch(`/api/admin/comments/${id}`, {
+      const response = await fetch(`/api/admin-8ca5e53f792989e9/comments/${id}`, {
         method: 'DELETE',
       });
 
