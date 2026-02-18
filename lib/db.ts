@@ -3,16 +3,15 @@ import { unstable_noStore as noStore } from 'next/cache';
 
 // 创建数据库连接
 const getDb = () => {
-  // 尝试多个可能的环境变量名称
+  // Neon 提供的环境变量优先级
   const connectionString = 
-    process.env.DATABASE_URL ||
-    process.env.POSTGRES_URL ||
     process.env.DATABASE_URL_UNPOOLED ||
-    process.env.POSTGRES_URL_NO_SSL;
+    process.env.POSTGRES_URL_NO_SSL ||
+    process.env.DATABASE_URL ||
+    process.env.POSTGRES_URL;
     
   if (!connectionString) {
-    console.error('可用的环境变量:', Object.keys(process.env).filter(k => k.includes('DATABASE') || k.includes('POSTGRES')));
-    throw new Error('数据库连接字符串未配置。请检查 DATABASE_URL 或 POSTGRES_URL 环境变量');
+    throw new Error('数据库连接字符串未配置');
   }
   // 使用 unknown 中间转换绕过类型检查
   return neon(connectionString) as unknown as (query: string, params?: unknown[]) => Promise<unknown[]>;
