@@ -1,5 +1,54 @@
-﻿import { sql } from '@vercel/postgres';
+﻿import { neon } from '@neondatabase/serverless';
 import { unstable_noStore as noStore } from 'next/cache';
+
+// 创建数据库连接
+const getDb = () => {
+  const connectionString = process.env.POSTGRES_URL || process.env.DATABASE_URL;
+  if (!connectionString) {
+    throw new Error('数据库连接字符串未配置');
+  }
+  // 使用 unknown 中间转换绕过类型检查
+  return neon(connectionString) as unknown as (query: string, params?: unknown[]) => Promise<unknown[]>;
+};
+
+// 定义 SQL 函数类型
+interface SqlFunction {
+  <T = unknown>(strings: TemplateStringsArray, ...values: (string | number | boolean | Date | null | undefined)[]): Promise<{ rows: T[] }>;
+  query: <T = unknown>(queryString: string, params?: (string | number | boolean | null)[]) => Promise<{ rows: T[] }>;
+}
+
+// SQL 查询函数 - 支持模板字符串
+async function sqlBase<T = unknown>(
+  strings: TemplateStringsArray,
+  ...values: (string | number | boolean | Date | null | undefined)[]
+): Promise<{ rows: T[] }> {
+  const db = getDb();
+  
+  // 构建查询字符串
+  let query = strings[0];
+  const params: unknown[] = [];
+  
+  for (let i = 0; i < values.length; i++) {
+    params.push(values[i]);
+    query += `$${i + 1}${strings[i + 1] || ''}`;
+  }
+  
+  const result = await db(query, params);
+  return { rows: result as T[] };
+}
+
+// 添加 query 方法
+const queryMethod = async <T = unknown>(
+  queryString: string,
+  params: (string | number | boolean | null)[] = []
+): Promise<{ rows: T[] }> => {
+  const db = getDb();
+  const result = await db(queryString, params);
+  return { rows: result as T[] };
+};
+
+// 导出 sql 函数
+const sql: SqlFunction = Object.assign(sqlBase, { query: queryMethod }) as SqlFunction;
 
 // 用户表
 export interface User {
