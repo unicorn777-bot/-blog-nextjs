@@ -1,36 +1,29 @@
-import { getPosts, getSettings } from '@/lib/db';
-import PostCard from '@/components/PostCard';
+﻿import { getTags, getSettings } from '@/lib/db';
 import Link from 'next/link';
 import { Metadata } from 'next';
+
+interface TagWithCount {
+  id: string;
+  name: string;
+  slug: string;
+  created_at: Date;
+  post_count?: number;
+}
 
 // ISR: 每10分钟重新验证
 export const revalidate = 600;
 
-// 生成元数据
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSettings();
   
   return {
-    title: settings.site_title || '欢迎来到2037',
-    description: settings.site_description || '这是一个关于未来科技和思考的博客',
-    keywords: settings.site_keywords?.split(',').map(k => k.trim()) || ['未来', '科技', '2037', '博客'],
-    authors: [{ name: settings.site_author || 'Asta333' }],
-    openGraph: {
-      title: settings.site_title || '欢迎来到2037',
-      description: settings.site_description || '这是一个关于未来科技和思考的博客',
-      type: 'website',
-      url: settings.site_url,
-    },
-    twitter: {
-      card: 'summary',
-      title: settings.site_title || '欢迎来到2037',
-      description: settings.site_description || '这是一个关于未来科技和思考的博客',
-    },
+    title: `标签 - ${settings.site_title || '欢迎来到2037'}`,
+    description: `浏览所有文章标签 - ${settings.site_description || ''}`,
   };
 }
 
-export default async function Home() {
-  const { posts } = await getPosts({ limit: 10 });
+export default async function TagsPage() {
+  const tags = await getTags();
   const settings = await getSettings();
 
   return (
@@ -60,28 +53,36 @@ export default async function Home() {
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="container mx-auto px-4 py-10 md:py-16 text-center">
-        <h1 className="text-3xl md:text-5xl font-bold text-slate-900 dark:text-slate-100 mb-3 md:mb-4">
-          {settings.site_title || '欢迎来到2037'}
+      {/* Tags */}
+      <main className="container mx-auto px-4 py-8 md:py-12 max-w-4xl">
+        <h1 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-slate-100 mb-6 md:mb-8">
+          标签
         </h1>
-        <p className="text-base md:text-xl text-slate-600 dark:text-slate-400 mb-6 md:mb-8 px-4">
-          {settings.site_description || '这是一个关于未来科技和思考的博客'}
-        </p>
-      </section>
 
-      {/* Posts Grid */}
-      <main className="container mx-auto px-4 py-4 md:py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-          {posts.map((post) => (
-            <PostCard key={post.id} post={{ ...post, categories: post.categories || [], tags: post.tags || [] }} />
-          ))}
+        <div className="flex flex-wrap gap-2 md:gap-3">
+          {tags.map((tag) => {
+            const t = tag as TagWithCount;
+            return (
+              <Link
+                key={tag.id}
+                href={`/tags/${tag.slug}`}
+                className="px-3 md:px-4 py-1.5 md:py-2 bg-white dark:bg-slate-800 rounded-full shadow-md hover:shadow-lg transition group flex items-center gap-2"
+              >
+                <span className="text-slate-900 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition text-sm md:text-base">
+                  {tag.name}
+                </span>
+                <span className="text-xs md:text-sm text-slate-500 dark:text-slate-500">
+                  ({t.post_count || 0})
+                </span>
+              </Link>
+            );
+          })}
         </div>
 
-        {posts.length === 0 && (
+        {tags.length === 0 && (
           <div className="text-center py-16">
             <p className="text-slate-600 dark:text-slate-400 text-lg">
-              暂无文章
+              暂无标签
             </p>
           </div>
         )}

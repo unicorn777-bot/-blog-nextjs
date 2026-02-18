@@ -1,37 +1,43 @@
-import { getPosts, getSettings } from '@/lib/db';
-import PostCard from '@/components/PostCard';
+import { getCategoryBySlug, getPosts, getSettings } from '@/lib/db';
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import PostCard from '@/components/PostCard';
 import { Metadata } from 'next';
 
-// ISR: 每10分钟重新验证
+// 动态渲染
+export const dynamic = 'force-dynamic';
 export const revalidate = 600;
 
 // 生成元数据
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const category = await getCategoryBySlug(slug);
   const settings = await getSettings();
-  
+
+  if (!category) {
+    return { title: '分类未找到' };
+  }
+
   return {
-    title: settings.site_title || '欢迎来到2037',
-    description: settings.site_description || '这是一个关于未来科技和思考的博客',
-    keywords: settings.site_keywords?.split(',').map(k => k.trim()) || ['未来', '科技', '2037', '博客'],
-    authors: [{ name: settings.site_author || 'Asta333' }],
-    openGraph: {
-      title: settings.site_title || '欢迎来到2037',
-      description: settings.site_description || '这是一个关于未来科技和思考的博客',
-      type: 'website',
-      url: settings.site_url,
-    },
-    twitter: {
-      card: 'summary',
-      title: settings.site_title || '欢迎来到2037',
-      description: settings.site_description || '这是一个关于未来科技和思考的博客',
-    },
+    title: `${category.name} - ${settings.site_title || '欢迎来到2037'}`,
+    description: category.description || `${category.name}分类下的所有文章`,
   };
 }
 
-export default async function Home() {
-  const { posts } = await getPosts({ limit: 10 });
+export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const category = await getCategoryBySlug(slug);
   const settings = await getSettings();
+
+  if (!category) {
+    notFound();
+  }
+
+  const { posts } = await getPosts({
+    limit: 100,
+    status: 'published',
+    categorySlug: slug,
+  });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
@@ -60,19 +66,29 @@ export default async function Home() {
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="container mx-auto px-4 py-10 md:py-16 text-center">
-        <h1 className="text-3xl md:text-5xl font-bold text-slate-900 dark:text-slate-100 mb-3 md:mb-4">
-          {settings.site_title || '欢迎来到2037'}
+      {/* Category Header */}
+      <section className="container mx-auto px-4 py-8 md:py-12 max-w-4xl">
+        <div className="mb-4">
+          <Link href="/categories" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 text-sm">
+            ← 返回分类列表
+          </Link>
+        </div>
+        <h1 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-slate-100 mb-3 md:mb-4">
+          {category.name}
         </h1>
-        <p className="text-base md:text-xl text-slate-600 dark:text-slate-400 mb-6 md:mb-8 px-4">
-          {settings.site_description || '这是一个关于未来科技和思考的博客'}
+        {category.description && (
+          <p className="text-base md:text-lg text-slate-600 dark:text-slate-400">
+            {category.description}
+          </p>
+        )}
+        <p className="text-sm text-slate-500 mt-2">
+          共 {posts.length} 篇文章
         </p>
       </section>
 
-      {/* Posts Grid */}
-      <main className="container mx-auto px-4 py-4 md:py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+      {/* Posts */}
+      <main className="container mx-auto px-4 py-4 md:py-8 max-w-4xl">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
           {posts.map((post) => (
             <PostCard key={post.id} post={{ ...post, categories: post.categories || [], tags: post.tags || [] }} />
           ))}
@@ -81,7 +97,7 @@ export default async function Home() {
         {posts.length === 0 && (
           <div className="text-center py-16">
             <p className="text-slate-600 dark:text-slate-400 text-lg">
-              暂无文章
+              该分类下暂无文章
             </p>
           </div>
         )}
